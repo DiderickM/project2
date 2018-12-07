@@ -25,12 +25,13 @@ int rightMotorCalibration = 255;
 void loop() {
   // put your main code here, to run repeatedly:
   currentDistance = getDistance();
-  Serial.println(currentDistance);
+//  Serial.println(currentDistance);
   bool RBuiten = digitalRead(A0);
   bool RBinnen = digitalRead(A1);
   bool LBinnen = digitalRead(A2);
   bool LBuiten = digitalRead(A3);
-  richting(RBuiten, RBinnen, LBinnen, LBuiten);
+  driveController(100, 100);
+//  richting(RBuiten, RBinnen, LBinnen, LBuiten);
 
 
 }
@@ -52,7 +53,7 @@ int getDistance () {
   return duration / 74 / 2;
 }
 
-void driveController(int leftDrive, int rightDrive) {
+void driveController(float leftDrive, float rightDrive) {
   int powerLeftDrive = 0;
   int powerRightDrive = 0;
   if(leftDrive == 0) {
@@ -60,6 +61,7 @@ void driveController(int leftDrive, int rightDrive) {
     analogWrite(motorLeftBackward, 0);
   } else if(leftDrive > 0) {
     powerLeftDrive = leftMotorCalibration * (leftDrive / 100);
+    Serial.println(powerLeftDrive);
     analogWrite(motorLeftForward, powerLeftDrive);
     analogWrite(motorLeftBackward, 0);
   } else {
@@ -72,20 +74,15 @@ void driveController(int leftDrive, int rightDrive) {
     analogWrite(motorRightForward, 0);
     analogWrite(motorRightBackward, 0);
   } else if(rightDrive > 0) {
+    
     powerRightDrive = rightMotorCalibration * (rightDrive / 100);
+    Serial.println(powerRightDrive);
     analogWrite(motorRightForward, powerRightDrive);
     analogWrite(motorRightBackward, 0);
   } else {
     powerRightDrive = rightMotorCalibration * (-1 * rightDrive / 100);
     analogWrite(motorRightForward, 0);
     analogWrite(motorRightBackward, powerRightDrive);
-  }
-  
-  if(currentDistance > 8 && rechtdoor) {
-    analogWrite(motorLeftForward, 150);
-    analogWrite(motorRightForward, 0);
-    analogWrite(motorLeftBackward, 0);
-    analogWrite(motorRightBackward, 255);    
   }
 }
 
