@@ -4,6 +4,11 @@
 #define motorRightBackward 5
 #define pingPin 7
 
+int RBuiten;
+int RBinnen;
+int LBinnen;
+int LBuiten;
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(motorLeftForward, OUTPUT);
@@ -30,10 +35,14 @@ void loop() {
   bool RBinnen = digitalRead(A1);
   bool LBinnen = digitalRead(A2);
   bool LBuiten = digitalRead(A3);
-  driveController(100, 100);
+  Serial.print(RBuiten);
+  Serial.print(RBinnen);
+  Serial.print(LBinnen);
+  Serial.print(LBuiten);
+
 //  richting(RBuiten, RBinnen, LBinnen, LBuiten);
 
-
+driveDirection(RBuiten, RBinnen, LBinnen, LBuiten);
 }
 
 int getDistance () {
@@ -61,7 +70,7 @@ void driveController(float leftDrive, float rightDrive) {
     analogWrite(motorLeftBackward, 0);
   } else if(leftDrive > 0) {
     powerLeftDrive = leftMotorCalibration * (leftDrive / 100);
-    Serial.println(powerLeftDrive);
+    
     analogWrite(motorLeftForward, powerLeftDrive);
     analogWrite(motorLeftBackward, 0);
   } else {
@@ -76,7 +85,7 @@ void driveController(float leftDrive, float rightDrive) {
   } else if(rightDrive > 0) {
     
     powerRightDrive = rightMotorCalibration * (rightDrive / 100);
-    Serial.println(powerRightDrive);
+    
     analogWrite(motorRightForward, powerRightDrive);
     analogWrite(motorRightBackward, 0);
   } else {
@@ -86,66 +95,59 @@ void driveController(float leftDrive, float rightDrive) {
   }
 }
 
-int richting(bool RBuiten, bool RBinnen, bool LBinnen, bool LBuiten) {
-  //TODO:
-  // - Stop als alle sensoren actief zijn
-  // - Ga links als dat mag
-  // - Ga daarna rechts
-  
-  /* KRUISPUNT */
-  if(RBuiten == 1 && RBinnen == 1 && LBinnen == 1 && LBuiten == 1){
-    analogWrite(motorLeftForward, 0);
-    analogWrite(motorRightForward, 0);
-    analogWrite(motorLeftBackward, 0);
-    analogWrite(motorRightBackward, 0); 
-  }
-
-  //kijk of de buiten sensoren niet actief zijn
-  bool buiten;
-  if(RBuiten == 0 && LBuiten == 0){
-    buiten = true;
+bool driveDirection(int RBuiten,int RBinnen,int LBinnen,int LBuiten){ 
+  if(forward(RBuiten, RBinnen, LBinnen, LBuiten)){
+    //ga wel rechtdoor
+    driveController(100, 100);
+    Serial.println("FORWARD");
   }else{
-    buiten = false;
+    //ga niet rechtdoor
+    if(right(RBuiten, RBinnen, LBinnen, LBuiten)){
+      driveController(100,50);
+      Serial.println("RIGHT");
+    }else{
+      if(left(RBuiten, RBinnen, LBinnen, LBuiten)){
+        driveController(50,100);
+        Serial.println("LEFT");
+      }
+    }
   }
-  
-  //kijk of de binnen sensorern actief zijn
-  bool binnen;
-  if(RBinnen == 1 && LBinnen == 1){
-    binnen = true;
+  Serial.println("OK");
+  return true;
+}
+
+bool forward(bool RBuiten,bool RBinnen,bool LBinnen,bool LBuiten){
+  if(RBuiten == false & LBuiten == false && RBinnen == true && LBinnen == true){
+    return true;
   }else{
-    binnen = false;
-  }
-
-  if(RBinnen == 1 && LBinnen == 0) {
-    analogWrite(motorLeftForward, 150);
-    analogWrite(motorRightForward, 0);
-    analogWrite(motorLeftBackward, 0);
-    analogWrite(motorRightBackward, 0);  
-  }
-
-  if(RBinnen == 0 && LBinnen == 1) {
-    analogWrite(motorLeftForward, 0);
-    analogWrite(motorRightForward, 0);
-    analogWrite(motorLeftBackward, 0);
-    analogWrite(motorRightBackward, 255);  
-  }
-
-  //als de robor rechtdoor moet
-  if(buiten == true && binnen == true){
-    analogWrite(motorLeftForward, 150);
-    analogWrite(motorRightForward, 0);
-    analogWrite(motorLeftBackward, 0);
-    analogWrite(motorRightBackward, 255);  
-  }
-
-  /*LINKS AF */
-  if(LBuiten = 0){
-    return false;
-  }
-
-  /*RECHTS AF */
-  if(RBuiten = 0){
     return false;
   }
 }
+
+bool right(bool RBuiten,bool RBinnen,bool LBinnen,bool LBuiten){
+  if(RBinnen == false && LBinnen == true){
+    return true;
+  }else{
+    return false;
+  }
+  if(RBuiten == true & LBuiten == true && RBinnen == false && LBinnen == false){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+bool left(bool RBuiten,bool RBinnen,bool LBinnen,bool LBuiten){
+  if(RBinnen == true && LBinnen == false){
+    return true;
+  }else{
+    return false;
+  }
+  if(RBuiten == false & LBuiten == false && RBinnen == true && LBinnen == true){
+    return true;
+  }else{
+    return false;
+  }
+}
+
 
