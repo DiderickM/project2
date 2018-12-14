@@ -23,11 +23,70 @@ int leftMotorCalibration = 255;
 int rightMotorCalibration = 255;
 
 void loop() {
-  bool RightOut = digitalRead(A0);
-  bool RightIn = digitalRead(A1);
-  bool LeftIn = digitalRead(A2);
-  bool LeftOut = digitalRead(A3);
-  bool value[4] = {RightOut, RightIn, LeftIn, LeftOut};
+  //value is een array waar de uiteindelijke beslissing in komt te staan
+  bool value[5];
+
+  //Array waar de waardes van de sensoren in komen
+  bool RightOutArray[5];
+  bool RightInArray[5];
+  bool LeftInArray[5];
+  bool LeftOutArray[5];
+
+  //waarde van de afstand meter
+  int lenght[5];
+
+  //vul de array's
+  for(int i = 0; i < 5; i++){
+    RightOutArray[i] = digitalRead(A0);
+    RightInArray[i] = digitalRead(A1);
+    LeftInArray[i] = digitalRead(A2);
+    LeftOutArray[i] = digitalRead(A3);
+    lenght[i] = getDistance();
+  }
+
+  //waardes waar de totaal aantal waardes in staan
+  float RightOutTotal;
+  float RightInTotal;
+  float LeftInTotal;
+  float LeftOutTotal;
+
+  //maak het totaal
+  for(int i = 0; i < 5; i++){
+    RightOutTotal = RightOutArray[i];
+    RightInTotal = RightInArray[i];
+    LeftInTotal = LeftInArray[i];
+    LeftOutTotal = LeftOutArray[i];
+  }
+
+  RightOutTotal = RightOutTotal / 5;
+  RightInTotal = RightInTotal / 5;
+  LeftInTotal = LeftInTotal / 5;
+  LeftOutTotal = LeftOutTotal / 5;
+  //bereken de waardes die kunenn worden gebruikt in de if-statements
+  if(RightOutTotal > 0.4){
+    value[0] = true;
+  }else{
+    value[0] = false;
+  }
+
+  if(RightInTotal > 0.4){
+    value[1] = true;
+  }else{
+    value[1] = false;
+  }
+
+  if(LeftInTotal > 0.4){
+    value[2] = true;
+  }else{
+    value[2] = false;
+  }
+
+  if(LeftOutTotal > 0.4){
+    value[3] = true;
+  }else{
+    value[3] = false;
+  }
+  
   currentDistance = getDistance();
   if(currentDistance > 5){
     int rechtdoor = richting(value[0], value[1], value[2], value[3]);
