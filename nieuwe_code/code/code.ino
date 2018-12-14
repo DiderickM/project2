@@ -49,6 +49,7 @@ void loop() {
   float RightInTotal;
   float LeftInTotal;
   float LeftOutTotal;
+  float lenghtTotal;
 
   //maak het totaal
   for(int i = 0; i < 5; i++){
@@ -56,12 +57,14 @@ void loop() {
     RightInTotal = RightInArray[i];
     LeftInTotal = LeftInArray[i];
     LeftOutTotal = LeftOutArray[i];
+    lenghtTotal = lenght[i]
   }
 
   RightOutTotal = RightOutTotal / 5;
   RightInTotal = RightInTotal / 5;
   LeftInTotal = LeftInTotal / 5;
   LeftOutTotal = LeftOutTotal / 5;
+  lenghtTotal = lenghtTotal / 5;
   //bereken de waardes die kunenn worden gebruikt in de if-statements
   if(RightOutTotal > 0.4){
     value[0] = true;
@@ -87,8 +90,7 @@ void loop() {
     value[3] = false;
   }
   
-  currentDistance = getDistance();
-  if(currentDistance > 5){
+  if(lenghtTotal > 5){
     int rechtdoor = richting(value[0], value[1], value[2], value[3]);
   }else{
     driveController(-100, -100);
