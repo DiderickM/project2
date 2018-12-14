@@ -32,10 +32,10 @@ void loop() {
   if(currentDistance > 5){
     int rechtdoor = richting(value[0], value[1], value[2], value[3]);
   }else{
-    driveContoller(-100, -100);
+    driveController(-100, -100);
     delayMicroseconds(50);
   }
-  Serial.println(rechtdoor);
+  
 }
 
 int getDistance () {
@@ -109,17 +109,17 @@ int richting(bool RO, bool RI, bool LI, bool LO) {
 
   // flouwe bocht naar rechts
   if(RO == true && RI == true && LI == false && LO == false){
-    driveContoller(-50, 100);
+    driveController(-50, 100);
   }
 
   // flouwe bocht naar links
   if(RO == false && RI == false && LI == true && LO == true){
-    driveContoller(100, -50);
+    driveController(100, -50);
   }
 
   // kruispunt
   if(RO == true && RI == true && LI == true && LO == true){
-    driveContoller(100, 100);
+    driveController(100, 100);
   }  
 }
 
