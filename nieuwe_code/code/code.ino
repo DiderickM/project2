@@ -41,7 +41,12 @@ void loop() {
     RightInArray[i] = digitalRead(A1);
     LeftInArray[i] = digitalRead(A2);
     LeftOutArray[i] = digitalRead(A3);
+    
+  }
+  for(int i = 0; i < 5; i++) {
     lenght[i] = getDistance();
+//    Serial.println(lenght[i]);/
+    delay(10);
   }
 
   //waardes waar de totaal aantal waardes in staan
@@ -53,11 +58,12 @@ void loop() {
 
   //maak het totaal
   for(int i = 0; i < 5; i++){
-    RightOutTotal = RightOutArray[i];
-    RightInTotal = RightInArray[i];
-    LeftInTotal = LeftInArray[i];
-    LeftOutTotal = LeftOutArray[i];
-    lenghtTotal = lenght[i]
+    RightOutTotal += RightOutArray[i];
+    RightInTotal += RightInArray[i];
+    LeftInTotal += LeftInArray[i];
+    LeftOutTotal += LeftOutArray[i];
+    lenghtTotal += lenght[i];
+    
   }
 
   RightOutTotal = RightOutTotal / 5;
@@ -90,13 +96,14 @@ void loop() {
     value[3] = false;
   }
   
-  if(lenghtTotal > 5){
+//  if(lenghtTotal > 5){
     int rechtdoor = richting(value[0], value[1], value[2], value[3]);
-  }else{
-    driveController(-100, -100);
-    delayMicroseconds(50);
-  }
-  
+
+//  }else{
+//    driveController(0, 0);
+//    delayMicroseconds(50);
+//  }
+//  
 }
 
 int getDistance () {
@@ -107,16 +114,14 @@ int getDistance () {
   delayMicroseconds(2);
   digitalWrite(pingPin, HIGH);
   delayMicroseconds(5);
-  digitalWrite(pingPin, LOW);
-
+  digitalWrite(pingPin, LOW); 
   pinMode(pingPin, INPUT);
   duration = pulseIn(pingPin, HIGH);
-
 
   return duration / 74 / 2;
 }
 
-void driveController(float leftDrive, float rightDrive) {
+void driveController(float rightDrive, float leftDrive) {
   int powerLeftDrive = 0;
   int powerRightDrive = 0;
   if(leftDrive == 0) {
@@ -124,7 +129,7 @@ void driveController(float leftDrive, float rightDrive) {
     analogWrite(motorLeftBackward, 0);
   } else if(leftDrive > 0) {
     powerLeftDrive = leftMotorCalibration * (leftDrive / 100);
-    Serial.println(powerLeftDrive);
+//    Serial.println(powerLeftDrive)/;
     analogWrite(motorLeftForward, powerLeftDrive);
     analogWrite(motorLeftBackward, 0);
   } else {
@@ -139,7 +144,7 @@ void driveController(float leftDrive, float rightDrive) {
   } else if(rightDrive > 0) {
     
     powerRightDrive = rightMotorCalibration * (rightDrive / 100);
-    Serial.println(powerRightDrive);
+//    Serial.println(powerRightDrive);/
     analogWrite(motorRightForward, powerRightDrive);
     analogWrite(motorRightBackward, 0);
   } else {
@@ -152,35 +157,72 @@ void driveController(float leftDrive, float rightDrive) {
 
 
 int richting(bool RO, bool RI, bool LI, bool LO) {
-  
+
+  Serial.print("RO: ");
+  Serial.println(RO);
+  Serial.print("RI: ");
+  Serial.println(RI);
+  Serial.print("LI: ");
+  Serial.println(LI);
+  Serial.print("LO: ");
+  Serial.println(LO);
+//  int driveDirection = 0;
+//  driveDirection = driveDirection + 10 * RO;
+//  driveDirection = driveDirection - 1 * RI;
+//  driveDirection = driveDirection + 1 * LI;
+//  driveDirection = driveDirection - 10 * LO;
+//
+//  if(driveDirection == 0) {
+//    driveController(100,100);
+//    Serial.println("rechtdoor");
+//  } else if(driveDirection == 1) {  // Flauwe bocht naar rechts 
+//    driveController(100, 0);
+//    Serial.println("naar links");
+//  } else if(driveDirection == -1) { // Flauwe bocht naar links
+//    driveController(0, 100);
+//    Serial.println("naar rechts");
+//  } else if(driveDirection < -1) {   // Links 90 graden
+//    driveController(-100, 100);
+//    Serial.println("scherpe naar  Rechts");
+//  } else if(driveDirection > 1) { // Rechts 90 graden
+//    driveController(100, -100);
+//    Serial.println("scherpe bocht naar links");
+//  }
+//  Serial.println(driveDirection);
   // rechtdoor
   if(RO == false && RI == true && LI == true && LO == false){
     driveController(100,100);
+    Serial.println("rechtdoor");
   }
   
   // rechts 90 graden
   if(RO == true && RI == true && LI == true && LO == false){
     driveController(100, -100);
+    Serial.println("rechts 90 graden");
   }
 
   // links 90 graden
   if(RO == false && RI == true && LI == true && LO == true){
     driveController(-100, 100);
+    Serial.println("links 90 graden");
   }
 
   // flouwe bocht naar rechts
-  if(RO == true && RI == true && LI == false && LO == false){
-    driveController(-50, 100);
+  if(RI == true && LI == false){
+    driveController(100, -50);
+    Serial.println("flouwe bocht naar rechts");
   }
 
   // flouwe bocht naar links
-  if(RO == false && RI == false && LI == true && LO == true){
-    driveController(100, -50);
+  if(RI == false && LI == true){
+    driveController(-50, 100);
+    Serial.println("flouwe bocht naar links");
   }
 
   // kruispunt
   if(RO == true && RI == true && LI == true && LO == true){
     driveController(100, 100);
+    Serial.println("kuispunt rechtdoor");
   }  
 }
 
