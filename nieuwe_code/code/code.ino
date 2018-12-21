@@ -19,7 +19,7 @@ void setup() {
 }
 
 long currentDistance = 0;
-int leftMotorCalibration = 255;
+int leftMotorCalibration = 250;
 int rightMotorCalibration = 255;
 
 void loop() {
@@ -45,7 +45,7 @@ void loop() {
   }
   for(int i = 0; i < 5; i++) {
     lenght[i] = getDistance();
-//    Serial.println(lenght[i]);/
+    Serial.println(lenght[i]);
     delay(10);
   }
 
@@ -72,25 +72,25 @@ void loop() {
   LeftOutTotal = LeftOutTotal / 5;
   lenghtTotal = lenghtTotal / 5;
   //bereken de waardes die kunenn worden gebruikt in de if-statements
-  if(RightOutTotal > 0.4){
+  if(RightOutTotal > 0.8){
     value[0] = true;
   }else{
     value[0] = false;
   }
 
-  if(RightInTotal > 0.4){
+  if(RightInTotal > 0.8){
     value[1] = true;
   }else{
     value[1] = false;
   }
 
-  if(LeftInTotal > 0.4){
+  if(LeftInTotal > 0.8){
     value[2] = true;
   }else{
     value[2] = false;
   }
 
-  if(LeftOutTotal > 0.4){
+  if(LeftOutTotal > 0.8){
     value[3] = true;
   }else{
     value[3] = false;
@@ -194,35 +194,47 @@ int richting(bool RO, bool RI, bool LI, bool LO) {
     driveController(100,100);
     Serial.println("rechtdoor");
   }
+
+  if(RO == true) {
+    driveController(90, 0);
+  }
+
+  if(LO == true) {
+    driveController(0, 90);
+  }
   
   // rechts 90 graden
   if(RO == true && RI == true && LI == true && LO == false){
-    driveController(100, -100);
+    driveController(90, -90);
     Serial.println("rechts 90 graden");
   }
 
   // links 90 graden
   if(RO == false && RI == true && LI == true && LO == true){
-    driveController(-100, 100);
+    driveController(-90, 90);
     Serial.println("links 90 graden");
   }
 
   // flouwe bocht naar rechts
   if(RI == true && LI == false){
-    driveController(100, -50);
+    driveController(90, -50);
     Serial.println("flouwe bocht naar rechts");
   }
 
   // flouwe bocht naar links
   if(RI == false && LI == true){
-    driveController(-50, 100);
+    driveController(-50, 90);
     Serial.println("flouwe bocht naar links");
   }
 
   // kruispunt
   if(RO == true && RI == true && LI == true && LO == true){
-    driveController(100, 100);
+    driveController(90, 90);
     Serial.println("kuispunt rechtdoor");
-  }  
+  }
+
+  if(RO == false && RI == false && LI == false && LO == false) {
+    driveController(90, 90);
+  }
 }
 
