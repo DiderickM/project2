@@ -22,6 +22,8 @@ long currentDistance = 0;
 int leftMotorCalibration = 250;
 int rightMotorCalibration = 255;
 
+int missingValues = 0;
+
 void loop() {
   //value is een array waar de uiteindelijke beslissing in komt te staan
   bool value[5];
@@ -167,30 +169,8 @@ int richting(bool RO, bool RI, bool LI, bool LO) {
   Serial.println(LI);
   Serial.print("LO: ");
   Serial.println(LO);
-//  int driveDirection = 0;
-//  driveDirection = driveDirection + 10 * RO;
-//  driveDirection = driveDirection - 1 * RI;
-//  driveDirection = driveDirection + 1 * LI;
-//  driveDirection = driveDirection - 10 * LO;
-//
-//  if(driveDirection == 0) {
-//    driveController(100,100);
-//    Serial.println("rechtdoor");
-//  } else if(driveDirection == 1) {  // Flauwe bocht naar rechts 
-//    driveController(100, 0);
-//    Serial.println("naar links");
-//  } else if(driveDirection == -1) { // Flauwe bocht naar links
-//    driveController(0, 100);
-//    Serial.println("naar rechts");
-//  } else if(driveDirection < -1) {   // Links 90 graden
-//    driveController(-100, 100);
-//    Serial.println("scherpe naar  Rechts");
-//  } else if(driveDirection > 1) { // Rechts 90 graden
-//    driveController(100, -100);
-//    Serial.println("scherpe bocht naar links");
-//  }
-//  Serial.println(driveDirection);
-  // rechtdoor
+
+  
   if(RO == false && RI == true && LI == true && LO == false){
     driveController(100,100);
     Serial.println("rechtdoor");
@@ -235,6 +215,17 @@ int richting(bool RO, bool RI, bool LI, bool LO) {
   }
 
   if(RO == false && RI == false && LI == false && LO == false) {
-    driveController(90, 90);
+    // krijgt nu een 0 waarde en hij moet opslaan hoe vaak die dat krijgt.
+    missingValues++;
+  }else{
+    if(missingValues > 0){
+      missingValues--;
+    }
+  }
+
+  if(missingValues > 20){
+    driveController(0, 0);
+    for(;;){
+    }
   }
 }
