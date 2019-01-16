@@ -18,15 +18,89 @@ void setup() {
   Serial.begin(9600);
 }
 
+unsigned long driveTimer = millis();
+
 long currentDistance = 0;
 int leftMotorCalibration = 250;
 int rightMotorCalibration = 255;
-
+bool reverse = 0;
 int missingValues = 0;
 
+bool value[5];
+
 void loop() {
+  getSensorValues();
+  
+  if(value[4]){
+    int rechtdoor = richting(value[0], value[1], value[2], value[3]);
+
+  }else{
+    driveController(0, 0);
+    delayMicroseconds(50);
+  }
+ 
+}
+
+int getDistance () {
+  long duration;
+
+  pinMode(pingPin, OUTPUT);
+  digitalWrite(pingPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pingPin, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(pingPin, LOW); 
+  pinMode(pingPin, INPUT);
+  duration = pulseIn(pingPin, HIGH);
+
+  return duration / 74 / 2;
+}
+
+void driveController(float rightDrive, float leftDrive) {
+  int powerLeftDrive = 0;
+  int powerRightDrive = 0;
+  if(reverse) {
+    rightDrive = -rightDrive;
+    leftDrive = -leftDrive;
+  }
+
+  if(leftDrive == 0) {
+    analogWrite(motorLeftForward, 0);
+    analogWrite(motorLeftBackward, 0);
+  } else if(leftDrive > 0) {
+    powerLeftDrive = leftMotorCalibration * (leftDrive / 100);
+//    Serial.println(powerLeftDrive)/;
+    analogWrite(motorLeftForward, powerLeftDrive);
+    analogWrite(motorLeftBackward, 0);
+  } else {
+    powerLeftDrive = leftMotorCalibration * (-1 * leftDrive / 100);
+    analogWrite(motorLeftForward, 0);
+    analogWrite(motorLeftBackward, powerLeftDrive);
+  }
+
+  if(rightDrive == 0) {
+    analogWrite(motorRightForward, 0);
+    analogWrite(motorRightBackward, 0);
+  } else if(rightDrive > 0) {
+    
+    powerRightDrive = rightMotorCalibration * (rightDrive / 100);
+//    Serial.println(powerRightDrive);/
+    analogWrite(motorRightForward, powerRightDrive);
+    analogWrite(motorRightBackward, 0);
+  } else {
+    powerRightDrive = rightMotorCalibration * (-1 * rightDrive / 100);
+    analogWrite(motorRightForward, 0);
+    analogWrite(motorRightBackward, powerRightDrive);
+  }
+}
+
+void toggleReverse() {
+  reverse = 1 - reverse; 
+}
+
+int getSensorValues() {
   //value is een array waar de uiteindelijke beslissing in komt te staan
-  bool value[5];
+  
 
   //Array waar de waardes van de sensoren in komen
   bool RightOutArray[5];
@@ -98,66 +172,12 @@ void loop() {
   }else{
     value[3] = false;
   }
-  
-  if(lenghtTotal > 5){
-    int rechtdoor = richting(value[0], value[1], value[2], value[3]);
-
-  }else{
-    driveController(0, 0);
-    delayMicroseconds(50);
-  }
- 
-}
-
-int getDistance () {
-  long duration;
-
-  pinMode(pingPin, OUTPUT);
-  digitalWrite(pingPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(pingPin, HIGH);
-  delayMicroseconds(5);
-  digitalWrite(pingPin, LOW); 
-  pinMode(pingPin, INPUT);
-  duration = pulseIn(pingPin, HIGH);
-
-  return duration / 74 / 2;
-}
-
-void driveController(float rightDrive, float leftDrive) {
-  int powerLeftDrive = 0;
-  int powerRightDrive = 0;
-  if(leftDrive == 0) {
-    analogWrite(motorLeftForward, 0);
-    analogWrite(motorLeftBackward, 0);
-  } else if(leftDrive > 0) {
-    powerLeftDrive = leftMotorCalibration * (leftDrive / 100);
-//    Serial.println(powerLeftDrive)/;
-    analogWrite(motorLeftForward, powerLeftDrive);
-    analogWrite(motorLeftBackward, 0);
+  if(lenghtTotal > 5) {
+    value[4] = true;
   } else {
-    powerLeftDrive = leftMotorCalibration * (-1 * leftDrive / 100);
-    analogWrite(motorLeftForward, 0);
-    analogWrite(motorLeftBackward, powerLeftDrive);
-  }
-
-  if(rightDrive == 0) {
-    analogWrite(motorRightForward, 0);
-    analogWrite(motorRightBackward, 0);
-  } else if(rightDrive > 0) {
-    
-    powerRightDrive = rightMotorCalibration * (rightDrive / 100);
-//    Serial.println(powerRightDrive);/
-    analogWrite(motorRightForward, powerRightDrive);
-    analogWrite(motorRightBackward, 0);
-  } else {
-    powerRightDrive = rightMotorCalibration * (-1 * rightDrive / 100);
-    analogWrite(motorRightForward, 0);
-    analogWrite(motorRightBackward, powerRightDrive);
+    value[4] = false;
   }
 }
-
-
 
 int richting(bool RO, bool RI, bool LI, bool LO) {
 
@@ -216,16 +236,37 @@ int richting(bool RO, bool RI, bool LI, bool LO) {
 
   if(RO == false && RI == false && LI == false && LO == false) {
     // krijgt nu een 0 waarde en hij moet opslaan hoe vaak die dat krijgt.
-    missingValues++;
+//    missingValues++;
+      driveController(80, 80);
+      Serial.println("test3");
   }else{
-    if(missingValues > 0){
-      missingValues--;
-    }
+    driveTimer = millis();
+    Serial.println("test2");
   }
 
-  if(missingValues > 20){
+  if(driveTimer <= (millis() - 1000)){
+    Serial.println("test1");
+    missingValues = 0;
     driveController(0, 0);
-    for(;;){
+    driveController(-90, -90);
+    while(true) {
+      getSensorValues();
+      if (value[0] || value[1] || value[2] || value[3]){
+        break;
+      }
     }
+    driveController(-90, 90);
+    bool set = false;
+    while(true) {
+      getSensorValues();
+      if(!(value[0] || value[1] || value[2] || value[3])){
+        set = true;
+      }
+      if((value[0] || value[1] || value[2] || value[3]) && set) {
+        break;
+      }
+    }
+    driveController(0,0);
+//    toggleReverse();
   }
 }
