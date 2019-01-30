@@ -59,10 +59,6 @@ int getDistance () {
 void driveController(float rightDrive, float leftDrive) {
   int powerLeftDrive = 0;
   int powerRightDrive = 0;
-  if(reverse) {
-    rightDrive = -rightDrive;
-    leftDrive = -leftDrive;
-  }
 
   if(leftDrive == 0) {
     analogWrite(motorLeftForward, 0);
@@ -94,9 +90,6 @@ void driveController(float rightDrive, float leftDrive) {
   }
 }
 
-void toggleReverse() {
-  reverse = 1 - reverse; 
-}
 
 int getSensorValues() {
   //value is een array waar de uiteindelijke beslissing in komt te staan
@@ -267,6 +260,5 @@ int richting(bool RO, bool RI, bool LI, bool LO) {
       }
     }
     driveController(0,0);
-//    toggleReverse();
   }
 }
